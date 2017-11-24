@@ -1,3 +1,5 @@
+@inject IBlogRepository blogRepository
+
 @model ListPostsViewModel
 @{
     int PreviousPageIndex = Model.PageIndex + 1;
@@ -20,9 +22,14 @@
         <a asp-area="" asp-controller="home" asp-action="page" asp-route-index="@PreviousPageIndex">Previous Page</a>
     }
 
-    @if (Model.PageIndex > 0)
+    @if (Model.PageIndex > 0 && !blogRepository.IsLastPage(Model.PageIndex))
     {
         <a asp-area="" asp-controller="home" asp-action="page" asp-route-index="@PreviousPageIndex">Previous Page</a>
+        <a asp-area="" asp-controller="home" asp-action="page" asp-route-index="@NextPageIndex">Next Page</a>
+    }
+
+    @if (Model.PageIndex > 0 && blogRepository.IsLastPage(Model.PageIndex))
+    {
         <a asp-area="" asp-controller="home" asp-action="page" asp-route-index="@NextPageIndex">Next Page</a>
     }
 </div>

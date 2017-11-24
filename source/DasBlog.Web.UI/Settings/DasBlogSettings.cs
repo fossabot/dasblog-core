@@ -50,7 +50,6 @@ namespace DasBlog.Web.UI.Settings
 
         public string ShortCutIconUrl { get; }
 
-
         public string GetBaseUrl()
         {
             return new Uri(this.SiteConfiguration.Root).AbsoluteUri;

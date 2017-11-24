@@ -87,5 +87,10 @@ namespace DasBlog.Web.UI.Repositories
             return new EntryCollection();
         }
 
+        public bool IsLastPage(int pageindex)
+        {
+            return (pageindex + 1) * this._dasBlogSettings.SiteConfiguration.FrontPageEntryCount >=
+                    _dataService.GetEntries(false).Count;
+        }
     }
 }

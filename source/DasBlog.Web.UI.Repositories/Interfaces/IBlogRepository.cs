@@ -7,6 +7,8 @@ namespace DasBlog.Web.UI.Repositories.Interfaces
 {
     public interface IBlogRepository
     {
+        bool IsLastPage(int pageindex);
+
         Entry GetBlogPost(string postid);
 
         EntryCollection GetFrontPagePosts();
