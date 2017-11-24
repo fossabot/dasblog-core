@@ -1,16 +1,22 @@
 ﻿@model PostViewModel
 
-@{
-    ViewData["Title"] = @Model.Title;
-}
-
 <div class="post">
-    <h2>@Model.Title</h2>
+    <a href="@Model.PermaLink"><h2>@Model.Title</h2></a>
     <div class="post-body">
         @Html.Raw(@Model.Content)
     </div>
     <div class="post-footer">
-        @Model.Categories
+        <ul class="post-category">
+            @if (Model.Categories != null && Model.Categories.Count > 0)
+            {
+                foreach (var category in Model.Categories)
+                {
+                    @Html.Partial("_CategoriesPartial", category)
+                }
+            }
+        </ul>
+        <br />
+        @Model.Created
     </div>
 </div>
 <hr />

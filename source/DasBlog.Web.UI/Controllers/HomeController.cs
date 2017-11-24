@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using DasBlog.Web.UI.Models;
@@ -31,19 +32,23 @@ namespace DasBlog.Web.UI.Controllers
         public IActionResult Index()
         {
             ListPostsViewModel lpvm = new ListPostsViewModel();
+            lpvm.PageIndex = 0;
             lpvm.Posts = _blogRepository.GetFrontPagePosts()
                             .Select(entry => new PostViewModel
                                 {
                                     Author = entry.Author,
                                     Content = entry.Content,
-                                    Categories = entry.Categories,
+                                    Categories = entry.Categories.Split(";").Select(category => new CategoryViewModel { CategoryName = category, CategoryNameUrlEncoded = WebUtility.UrlEncode(category) }).ToList(),
                                     Description = entry.Description,
                                     EntryId = entry.EntryId,
                                     AllowComments = entry.AllowComments,
                                     IsPublic = entry.IsPublic,
-                                    PermaLink = entry.Link,
-                                    Title = entry.Title
-                                }).ToList();
+                                    PermaLink = entry.CompressedTitle.Replace("+", _dasBlogSettings.SiteConfiguration.TitlePermalinkSpaceReplacement).ToLower(),
+                                    Title = entry.Title,
+                                    Created = entry.CreatedLocalTime,
+                                    Modified = entry.ModifiedLocalTime
+                            }).ToList();
+
             MultiplePosts();
 
             return View(string.Format("/Themes/{0}/Page.cshtml", _dasBlogSettings.SiteConfiguration.Theme), lpvm);
@@ -52,6 +57,7 @@ namespace DasBlog.Web.UI.Controllers
         public IActionResult Post(string posttitle)
         {
             ListPostsViewModel lpvm = new ListPostsViewModel();
+            lpvm.PageIndex = -1;
 
             if (!string.IsNullOrEmpty(posttitle))
             {
@@ -60,15 +66,19 @@ namespace DasBlog.Web.UI.Controllers
                 {
                     lpvm.Posts = new List<PostViewModel>() {
                         new PostViewModel {
-                        Author = entry.Author,
-                        Content = entry.Content,
-                        Categories = entry.Categories,
-                        Description = entry.Description,
-                        EntryId = entry.EntryId,
-                        AllowComments = entry.AllowComments,
-                        IsPublic = entry.IsPublic,
-                        PermaLink = entry.Link,
-                        Title = entry.Title}};
+                            Author = entry.Author,
+                            Content = entry.Content,
+                            Categories = entry.Categories.Split(";").Select(category => new CategoryViewModel { CategoryName = category, CategoryNameUrlEncoded = WebUtility.UrlEncode(category) }).ToList(),
+                            Description = entry.Description,
+                            EntryId = entry.EntryId,
+                            AllowComments = entry.AllowComments,
+                            IsPublic = entry.IsPublic,
+                            PermaLink = entry.CompressedTitle.Replace("+", _dasBlogSettings.SiteConfiguration.TitlePermalinkSpaceReplacement).ToLower(),
+                            Title = entry.Title,
+                            Created = entry.CreatedLocalTime,
+                            Modified = entry.ModifiedLocalTime
+                        }
+                    };
 
                     SinglePost(lpvm.Posts.First());
 
@@ -94,21 +104,23 @@ namespace DasBlog.Web.UI.Controllers
             Entry entry = _blogRepository.GetBlogPost(Id.ToString());
 
             ListPostsViewModel lpvm = new ListPostsViewModel();
+            lpvm.PageIndex = -1;
             lpvm.Posts = new List<PostViewModel> {
                     new PostViewModel
                     {
                         Author = entry.Author,
                         Content = entry.Content,
-                        Categories = entry.Categories,
+                        Categories = entry.Categories.Split(";").Select(category => new CategoryViewModel { CategoryName = category, CategoryNameUrlEncoded = WebUtility.UrlEncode(category) }).ToList(),
                         Description = entry.Description,
                         EntryId = entry.EntryId,
                         AllowComments = entry.AllowComments,
                         IsPublic = entry.IsPublic,
-                        PermaLink = entry.Link,
-                        Title = entry.Title
+                        PermaLink = entry.CompressedTitle.Replace("+", _dasBlogSettings.SiteConfiguration.TitlePermalinkSpaceReplacement).ToLower(),
+                        Title = entry.Title,
+                        Created = entry.CreatedLocalTime,
+                        Modified = entry.ModifiedLocalTime
                     }
                 };
-
             SinglePost(lpvm.Posts.First());
 
             return View(string.Format("/Themes/{0}/Page.cshtml", _dasBlogSettings.SiteConfiguration.Theme), lpvm);
@@ -127,45 +139,29 @@ namespace DasBlog.Web.UI.Controllers
             {
                 return Index();
             }
-
-            ViewData["Message"] = string.Format("Page...{0}", index);
-
+            
             ListPostsViewModel lpvm = new ListPostsViewModel();
+            lpvm.PageIndex = index;
             lpvm.Posts = _blogRepository.GetEntriesForPage(index)
                                 .Select(entry => new PostViewModel
                                 {
                                     Author = entry.Author,
                                     Content = entry.Content,
-                                    Categories = entry.Categories,
+                                    Categories = entry.Categories.Split(";").Select(category => new CategoryViewModel { CategoryName = category, CategoryNameUrlEncoded = WebUtility.UrlEncode(category) }).ToList(),
                                     Description = entry.Description,
                                     EntryId = entry.EntryId,
                                     AllowComments = entry.AllowComments,
                                     IsPublic = entry.IsPublic,
-                                    PermaLink = entry.Link,
-                                    Title = entry.Title
+                                    PermaLink = entry.CompressedTitle.Replace("+", _dasBlogSettings.SiteConfiguration.TitlePermalinkSpaceReplacement).ToLower(),
+                                    Title = entry.Title,
+                                    Created = entry.CreatedLocalTime,
+                                    Modified = entry.ModifiedLocalTime
                                 }).ToList();
             MultiplePosts();
 
             return View(string.Format("/Themes/{0}/Page.cshtml", _dasBlogSettings.SiteConfiguration.Theme), lpvm);
         }
 
-        public IActionResult About()
-        {
-            MultiplePosts();
-
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            MultiplePosts();
-
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
 
         public IActionResult Error()
         {
@@ -175,14 +171,14 @@ namespace DasBlog.Web.UI.Controllers
         private void SinglePost(PostViewModel post)
         {
             ViewData["Title"] = post.Title;
-            ViewData["Description"] = post.Description;
+            ViewData["Description"] = post.Content;
             ViewData["Keywords"] = post.Categories;
             ViewData["Canonical"] = post.PermaLink;
-            ViewData["Author"] = post.Author;
         }
 
         private void MultiplePosts()
         {
+            ViewData["SiteTitle"] = _dasBlogSettings.SiteConfiguration.Title;
             ViewData["Title"] = _dasBlogSettings.SiteConfiguration.Title;
             ViewData["Description"] = _dasBlogSettings.SiteConfiguration.Description;
             ViewData["Keywords"] = _dasBlogSettings.MetaTags.MetaKeywords;

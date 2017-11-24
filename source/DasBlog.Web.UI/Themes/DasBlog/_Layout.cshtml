@@ -18,8 +18,7 @@
 
     <link rel="alternate" type="application/rss+xml" title="@dasBlogSettings.SiteConfiguration.Description" href="@dasBlogSettings.RssUrl" />
     <link rel="EditURI" type="application/rsd+xml" title="RSD" href="@dasBlogSettings.RsdUrl" />
-    <link rel="microsummary" type="application/x.microsummary+xml" href="@dasBlogSettings.MicroSummaryUrl" />
-
+    <link rel="sitemap" href="@dasBlogSettings.SiteMap" />
     <link rel="shortcut icon" href="@dasBlogSettings.ShortCutIconUrl" />
 
     <environment names="Development">
@@ -41,15 +40,13 @@
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
                 </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">WebCoreApp</a>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">@dasBlogSettings.SiteConfiguration.Title</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    <li><a asp-area="" asp-controller="Archive" asp-action="Index">Archive</a></li>
+                    <li><a asp-area="" asp-controller="Category" asp-action="Index">Category</a></li>
                 </ul>
                 @await Html.PartialAsync("_LoginPartial")
             </div>

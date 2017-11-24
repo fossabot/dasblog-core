@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace DasBlog.Web.UI.Models.BlogViewModels
 {
-    public class ListPostsViewModel
+    public class CategoryViewModel
     {
-        public IList<PostViewModel> Posts { get; set; }
-        public int PageIndex { get; set; }
+        public string CategoryName { get; set; }
+        public string CategoryNameUrlEncoded { get; set; }
     }
 }

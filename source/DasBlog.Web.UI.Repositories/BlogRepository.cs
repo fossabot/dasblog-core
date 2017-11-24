@@ -23,6 +23,7 @@ namespace DasBlog.Web.UI.Repositories
 
         public Entry GetBlogPost(string postid)
         {
+            postid = postid.Replace(_dasBlogSettings.SiteConfiguration.TitlePermalinkSpaceReplacement, string.Empty);
             return _dataService.GetEntry(postid);
         }
 

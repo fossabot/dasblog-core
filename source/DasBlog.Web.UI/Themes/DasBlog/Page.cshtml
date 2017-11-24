@@ -1,17 +1,28 @@
 @model ListPostsViewModel
+@{
+    int PreviousPageIndex = Model.PageIndex + 1;
+    int NextPageIndex = Model.PageIndex - 1;
+}
 
 <div id="content">
-
-    @if (Model.Posts.Count > 0)
+    @if (Model.Posts!= null && Model.Posts.Count > 0)
     {
         foreach (var post in Model.Posts)
         {
             @Html.Partial("_PostPartial", post)
         }
     }
-    else
+</div>
+<div id="content-footer">
+
+    @if (Model.PageIndex == 0)
     {
-        <p>No posts found!</p>
+        <a asp-area="" asp-controller="home" asp-action="page" asp-route-index="@PreviousPageIndex">Previous Page</a>
     }
 
+    @if (Model.PageIndex > 0)
+    {
+        <a asp-area="" asp-controller="home" asp-action="page" asp-route-index="@PreviousPageIndex">Previous Page</a>
+        <a asp-area="" asp-controller="home" asp-action="page" asp-route-index="@NextPageIndex">Next Page</a>
+    }
 </div>

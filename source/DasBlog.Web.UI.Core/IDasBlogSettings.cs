@@ -18,7 +18,7 @@ namespace DasBlog.Web.UI.Core
         string RssUrl { get; }
         string CategoryUrl { get; }
         string ArchiveUrl { get; }
-        string MicroSummaryUrl { get; }
+        string SiteMap { get; }
         string RsdUrl { get; }
 
         string ShortCutIconUrl { get; }
